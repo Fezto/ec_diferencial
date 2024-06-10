@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Vite App</title>
+    <style>
+        .katex-mathml {
+            font-size: 5rem; /* Ajusta este valor a tus necesidades */
+        }
+
+        #main {
+            display: flex;
+            flex-direction: column;
+            vertical-align: center;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+<div id="main">
+    <div>
+        <h1>Tu solución: </h1>
+    </div>
+    <div>
+        <input type="text" id="problem_input" placeholder="Ingresa tu problema aquí">
+        <button id="submit_button">Enviar</button>
+    </div>
+    <div id="div_solution">
+    </div>
+</div>
+</body>
+
+<script type="module">
+    let button = document.getElementById("submit_button")
+    let input = document.getElementById("problem_input")
+
+    button.addEventListener("click", () => {
+        let problem = input.value
+        print_solution(problem)
+    })
+
+    async function print_solution(problem){
+        let encodedProblem = encodeURIComponent(problem)
+        console.log("Encoded problem:", encodedProblem)
+
+        let solution = await fetch(`http://127.0.0.1:3117/solution/${encodedProblem}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(json => json.solution)
+            .catch(error => console.error('There has been a problem with your fetch operation:', error));
+
+        console.log("solution:", solution)
+        let encodedSolution = encodeURIComponent(solution)
+        console.log("Encoded solution:", encodedSolution)
+
+        // Obtenemos el html de la solución y lo insertamos en el DOM
+        let render = await fetch(`http://127.0.0.1:3117/render/${encodedSolution}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(json => json.html)
+            .catch(error => console.error('There has been a problem with your fetch operation:', error));
+
+        // Obtenemos el elemento donde mostraremos la solución
+        const resultElement = document.getElementById('div_solution');
+
+        // Implantamos el html de la solución al elemento
+        resultElement.innerHTML = render;
+    }
+</script>
+</html>
