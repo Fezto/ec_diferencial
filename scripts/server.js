@@ -2,38 +2,47 @@ import Fastify from "fastify"
 import katex from "katex"
 import { JSDOM } from "jsdom"
 import cors from '@fastify/cors'
-import { getSolution, parseSolution } from "./logic.js";
+import { ask_Wolfram, XML_to_JSON } from "./logic.js";
 
-//* Creamos instancia de Fastify
+// * Creamos instancia de Fastify
 const app = Fastify({
     logger: true
 })
 
-//* Habilitamos CORS para que nuestro servidor pueda
-//* comunicarse con la página web
+// * Habilitamos CORS para que nuestro servidor pueda comunicarse con la página web
 await app.register(cors, {
     logLevel: "debug"
 })
 
 
 
-//* -------- RUTAS ----------
+// * -------- RUTAS ----------
 
-//* Ruta DEBUG
+// * Ruta DEBUG
 app.get("/debug", async (request, reply) => {
     return {prueba: "bien!"}
 })
 
-//* Ruta que recibe el problema y retorna en TEX la
-//* la solución
-app.get("/solution/:problem", async function handler(request, reply) {
+
+// ! Paso 5: Recibimos el problema en el sv local por callSolution. Ahora, llamamos a la
+// ! función que sí resuelve, getSolution()
+app.get("/solution/:encoded_problem", async function handler(request, reply) {
     try {
-        const encodedProblem = request.params.problem;
-        const problem = decodeURIComponent(encodedProblem)
-        console.log('Problem:', problem);  // Log the problem
-        const solution = await getSolution(problem)
-        const parsedSolution = await parseSolution(solution)
-        return {solution: parsedSolution}
+        const encoded_problem = request.params.encoded_problem;
+        const problem_string = decodeURIComponent(encoded_problem)
+        const solution_XML = await ask_Wolfram(problem_string)
+
+
+        // ! Paso 7: Si hay una solución, llamamos a la función que parsea el XML a JSON
+        if (solution_XML) {
+            const solution_JSON = await XML_to_JSON(solution_XML)
+
+            // ! Paso 9: Una vez parseado el XML a JSON, lo devolvemos
+            return solution_JSON
+        } else {
+            console.error('No solution found in the response:', solution_XML);
+            throw new Error('No solution found in the response');
+        }
     } catch (err) {
         console.error('Error in /solution/:problem endpoint:', err);
         throw err;
@@ -42,11 +51,12 @@ app.get("/solution/:problem", async function handler(request, reply) {
 
 //* Ruta que envía la ecuación diferencial en TEX y lo
 //* renderiza en el DOM
-app.get("/render/:solution", async (request, reply) => {
+app.get("/render/:encoded_solution", async (request, reply) => {
     try {
-        const encodedSolution = request.params.solution;
-        const solution = decodeURIComponent(encodedSolution)
+        const encoded_solution = request.params.encoded_solution;
+        const solution = decodeURIComponent(encoded_solution)
 
+        console.log(`solución antes de LATEX: ${solution}`)
         const html = katex.renderToString(solution, {
             throwOnError: false
         })
