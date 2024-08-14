@@ -1,8 +1,8 @@
 import Fastify from "fastify"
 import katex from "katex"
-import { JSDOM } from "jsdom"
+import {JSDOM} from "jsdom"
 import cors from '@fastify/cors'
-import { ask_Wolfram, XML_to_JSON } from "./logic.js";
+import {ask_Wolfram, XML_to_JSON} from "./logic.js";
 
 // * Creamos instancia de Fastify
 const app = Fastify({
@@ -11,9 +11,12 @@ const app = Fastify({
 
 // * Habilitamos CORS para que nuestro servidor pueda comunicarse con la página web
 await app.register(cors, {
-    logLevel: "debug"
+    origin: "*", // Permitir todas las solicitudes de origen
+    methods: ["GET", "POST"], // Métodos permitidos
+    allowedHeaders: ["Content-Type", "Authorization"], // Encabezados permitidos
+    preflightContinue: false,
+    optionsSuccessStatus: 204
 })
-
 
 
 // * -------- RUTAS ----------

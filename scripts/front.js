@@ -2,17 +2,29 @@ import axios from "axios"
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 let button = document.getElementById("submit_button")
-let input = document.getElementById("problem_input")
 
 // ! Paso 1: El usuario da clic en el boton. Inicia todo el proceso
+
+var MQ = MathQuill.getInterface(2);
+var answerSpan = document.getElementById('answer');
+var answerMathField = MQ.MathField(answerSpan, {
+    handlers: {
+        edit: function () {
+            var enteredMath = answerMathField.latex();
+            console.log(enteredMath);
+        }
+    }
+});
+
 button.addEventListener("click", () => {
-    let problem_string = input.value
+    let problem_string = answerMathField.latex(); // Cambiado a answerMathField.latex()
     console.log(`0. Problema recibido en input: ${problem_string}`)
     printSolution(problem_string)
 })
 
+
 // ! Paso 2: printSolution es llamado.
-async function printSolution(problem_string){
+async function printSolution(problem_string) {
     try {
         // ! Paso 3: callSolution es llamado.
         let solution_info = await callSolution(problem_string);

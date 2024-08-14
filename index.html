@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8"/>
     <link rel="icon" type="image/svg+xml" href="/vite.svg"/>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/5.3.3/css/bootstrap.min.css">
+    <link rel="stylesheet" href="./scripts/mathquill.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Vite App</title>
     <style>
@@ -10,32 +12,68 @@
             font-size: 3rem; /* Ajusta este valor a tus necesidades */
         }
 
+        .mathquill-editable .mq-paren {
+            font-size: 10em; /* Adjust this value as needed */
+        }
+
+        body {
+            background-color: #66aaee !important;
+        }
+
         #main {
             display: flex;
             flex-direction: column;
-            vertical-align: center;
             align-items: center;
             justify-content: center;
+            min-height: 100vh;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary {
+            background-color: #007bff;
+            border-color: #007bff;
+        }
+
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #004085;
         }
     </style>
 </head>
 <body>
-<div id="main">
-    <div>
-        <h1>Inserta tu problema </h1>
-    </div>
-    <div>
-        <input type="text" id="problem_input" placeholder="Ingresa tu problema aquí">
-        <button id="submit_button">Enviar</button>
-    </div>
-    <div>
-        <h2 id="type"></h2>
+<div id="main" class="container">
+    <div class="card mb-3 w-75">
+        <div class="card-body text-center">
+            <h1>Inserta tu problema</h1>
+        </div>
     </div>
 
-    <div id="div_solution">
+    <div class="card w-50 mb-5">
+        <div class="card-body">
+            <div class="mb-3">
+                <span id="answer" class="w-100"></span>
+            </div>
+            <div>
+                <button id="submit_button" class="btn btn-primary w-100">Enviar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card w-75">
+        <div class="card-body">
+            <h2 class="mb-4 text-center">Tu solución:</h2>
+            <div class="text-center">
+                <h2 id="type"></h2>
+                <div id="div_solution"></div>
+            </div>
+        </div>
     </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+<script src="./scripts/mathquill.js"></script>
+<script type="module" src="scripts/front.js"></script>
 </body>
-
-<script type="module" src="scripts/front.js"> </script>
 </html>
